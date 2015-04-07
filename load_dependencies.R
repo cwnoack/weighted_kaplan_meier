@@ -1,3 +1,4 @@
+# This function will install any packages necessary for analysis and then load them
 load_dependencies <- function(pkgs = list('plyr','dplyr',
                                           'ggplot2','ggthemes')){
   is.installed <- function(pkg){

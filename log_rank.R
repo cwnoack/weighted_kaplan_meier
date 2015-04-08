@@ -3,13 +3,13 @@ log_rank <- function(grouped_data, comp_group = NULL, rho = 1,
   if(is.null(comp_group)){
     
     grps <- levels(factor(grouped_data$Dataset))
-    ref <- filter(grouped_data, Dataset == grps[1])
-    comp <- filter(grouped_data, Dataset == grps[2])
+    ref <- filter(grouped_data, Dataset == grps[1]) %>% select(-Dataset)
+    comp <- filter(grouped_data, Dataset == grps[2]) %>% select(-Dataset)
     
   } else {
     
-    ref <- filter(grouped_data, Dataset != comp_group)
-    comp <- filter(grouped_data, Dataset == comp_group)
+    ref <- filter(grouped_data, Dataset != comp_group) %>% select(-Dataset)
+    comp <- filter(grouped_data, Dataset == comp_group) %>% select(-Dataset)
     
   }
   

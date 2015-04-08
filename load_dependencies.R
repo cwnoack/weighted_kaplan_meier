@@ -1,5 +1,5 @@
 # This function will install any packages necessary for analysis and then load them
-load_dependencies <- function(pkgs = list('plyr','dplyr',
+load_dependencies <- function(pkgs = list('plyr','dplyr','tidyr',
                                           'ggplot2','ggthemes')){
   is.installed <- function(pkg){
     if(!(require(pkg, character.only = T, quietly = T, warn.conflicts = F))){

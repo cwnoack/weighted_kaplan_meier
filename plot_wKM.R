@@ -3,6 +3,7 @@ plot_wKM <- function(grouped_km, log_scale = T, n_ticks = 5,
   par(list(oma = c(0,0,0,0),
            mar = c(4.5,4.5,1,1)))
   if(log_scale){
+    stopifnot(all(grouped_km$Concentration > 0))
     C <- log10(grouped_km$Concentration)
     rng <- c(floor(min(C)), ceiling(max(C)))
     x_limits <- 10^rng

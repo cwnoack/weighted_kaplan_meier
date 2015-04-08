@@ -9,28 +9,25 @@ plot_wKM <- function(grouped_km, log_scale = T, n_ticks = 5,
     ticks <- signif(seq(rng[1],rng[2], length.out = n_ticks), 2)
     tick_labs <- sapply(ticks, function(i) as.expression(bquote(10^.(i))))
     ticks <- 10^ticks
-    plot(1,1, log = 'x', type = 'n', bty = 'n',
-         xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', xlim = x_limits,
-         ylim = c(0,1))
-    axis(1, at = ticks, labels = tick_labs, lwd = 2, tck = -0.03)
-    mtext(paste('Concentration, ',units, sep = ''), 1, line = 2.2)
-    axis(2, las = 1, lwd = 2, tck = -0.03, line = -0.5)
-    mtext(expression(paste("Cumulative fraction of samples, ",
-                           widehat(F[x])(x), sep = '')), side = 2, line = 2.2)
+    log_val <- 'x'
+    
   } else {
     C <- grouped_km$Concentration
     rng <- c(floor(min(C)), ceiling(max(C)))
     x_limits <- rng
     ticks <- signif(seq(rng[1],rng[2], length.out = n_ticks), 2)
-    plot(1,1, type = 'n', bty = 'n',
-         xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', xlim = x_limits,
-         ylim = c(0,1))
-    axis(1, at = ticks, lwd = 2, tck = -0.03)
-    mtext(paste('Concentration, ',units, sep = ''), 1, line = 2.2)
-    axis(2, las = 1, lwd = 2, tck = -0.03, line = -0.5)
-    mtext(expression(paste("Cumulative fraction of samples, ",
-                           widehat(F[x])(x), sep = '')), side = 2, line = 2.2)
+    tick_labs <- ticks
+    log_val <- ''
   }
+  
+  plot(1,1, log = log_val, type = 'n', bty = 'n',
+       xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', xlim = x_limits,
+       ylim = c(0,1))
+  axis(1, at = ticks, labels = tick_labs, lwd = 2, tck = -0.03)
+  mtext(paste('Concentration, ',units, sep = ''), 1, line = 2.2)
+  axis(2, las = 1, lwd = 2, tck = -0.03, line = -0.5)
+  mtext(expression(paste("Cumulative fraction of samples, ",
+                         widehat(F[x])(x), sep = '')), side = 2, line = 2.2)
   
   n_colors <- length(unique(grouped_km$Dataset))
   color_df <- data.frame(Dataset = unique(grouped_km$Dataset),

@@ -13,8 +13,8 @@ sim_G_rho <- function(grouped_data, rho = 1, method = 'perm'){
   
   grouped_data$Dataset <- new_labs
   
-  G1 <- filter(grouped_data, Dataset == data_levels[1])
-  G2 <- filter(grouped_data, Dataset == data_levels[2])
+  G1 <- filter(grouped_data, Dataset == data_levels[1]) %>% select(-Dataset)
+  G2 <- filter(grouped_data, Dataset == data_levels[2]) %>% select(-Dataset)
   
   G_sim <- G_rho(G1, G2, rho)
   

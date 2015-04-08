@@ -1,8 +1,12 @@
 # Return the weighted survival estimator
-Surv_weighted <- function(censored_data = analyte){
+Surv_weighted <- function(censored_data){
   check_input(censored_data)
+  
   names(censored_data) <- c('Concentration','Censored','Site')
-  censored_data$Site <- factor(censored_data$Site)
+  
+  if(!is.factor(censored_data$Site)){
+    censored_data$Site <- factor(censored_data$Site)
+  }
   
   site_weights <- calc_weights(censored_data$Site)
   

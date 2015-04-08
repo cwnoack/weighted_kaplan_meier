@@ -3,6 +3,10 @@ Surv_quantile <- function(censored_data,
                           type = 'interp'){
   weighted_km <- Surv_weighted(censored_data) %>% select(Concentration, S)
   
+  if(any(weighted_km$S < min(percentiles))){
+    warning('Minimum desired percentile below minimum calculated from data, may produce NA values.')
+  }
+  
   fl.h <- function(percentile, S){
     h.temp <- which.min(abs(S - percentile))
     if(type != 'nearest' && S[h.temp]>percentile) {h.temp <- h.temp + 1}
@@ -11,18 +15,18 @@ Surv_quantile <- function(censored_data,
   
   h.low <- sapply(percentiles, function(p) fl.h(p, weighted_km$S))
   h.high <- h.low - 1
-  perc_df <- data.frame(percentiles, h.low, h.high)
+  perc_df <- data.frame(Percentile = percentiles, h.low, h.high)
   
   switch(type,
          interp = {perc_df <- perc_df %>%
                      mutate(Xh = approx(x = weighted_km[c(h.low, h.high),'S'],
                                         y = weighted_km[c(h.low, h.high),'Concentration'],
-                                        xout = percentiles)$y)},
+                                        xout = Percentile)$y)},
          PiR = {perc_df <- perc_df %>%
                   mutate(Xh = weighted_km[h.low,'Concentration'])},
          nearest = {perc_df <- perc_df %>%
                       mutate(Xh = weighted_km[h.low,'Concentration'])})
   
-  perc_df <- perc_df %>% arrange(desc(percentiles)) %>% select(percentiles, Xh)
+  perc_df <- perc_df %>% arrange(desc(Percentile)) %>% select(Percentile, Xh)
   return(perc_df)
 }

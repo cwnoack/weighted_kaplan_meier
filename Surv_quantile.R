@@ -1,7 +1,15 @@
 Surv_quantile <- function(censored_data,
                           percentiles = c(0.05,0.1,0.25,0.5,0.75,0.9,0.95),
                           type = 'interp'){
+  cenfrac <- mean(censored_data$Censored)
+  
   weighted_km <- Surv_weighted(censored_data) %>% select(Concentration, S)
+  
+  if(any(cenfrac > percentiles)){
+    warning(paste('The fraction of censored data is larger ',
+                  'than one or more desired percentiles.\n',
+                  'This may produce NA values or unreliable estimates.', sep = ''))
+  }
   
   if(any(weighted_km$S < min(percentiles))){
     warning('Minimum desired percentile below minimum calculated from data, may produce NA values.')

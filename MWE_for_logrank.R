@@ -1,7 +1,7 @@
 source('run_at_startup_to_load.R')
 
 # Group means
-means <- c(1,1.5,5)
+means <- c(1,1.5,2.2)
 
 # Samples in each group
 N <- 50
@@ -19,8 +19,10 @@ R.g <- gather(R, Dataset,Concentration,Control:Highest) %>%
                        prob = 1:10/sum(1:10)))
 
 
-CvsH <- filter(R.g, Dataset != 'Highest')
-CvsH_test <- log_rank(CvsH, comp_group = 'High',
-                     rho = 0, method = 'sim',
-                     boots = 100, alternative = 'greater')
+CvsH <- filter(R.g, Dataset != 'High')
+CvsH_test <- log_rank(CvsH, comp_group = 'Highest',
+                     rho = 1, method = 'sim',
+                     boots = 1000, alternative = 'greater')
 plot_wKM(group_km(grouped_data = CvsH), log_scale = T)
+
+G_rho_hist(CvsH_test)

@@ -1,6 +1,6 @@
 # This function will install any packages necessary for analysis and then load them
 load_dependencies <- function(pkgs = list('plyr','dplyr','tidyr',
-                                          'ggplot2','ggthemes')){
+                                          'ggplot2','ggthemes'), verbose = F){
   is.installed <- function(pkg){
     if(!(require(pkg, character.only = T, quietly = T, warn.conflicts = F))){
       install.packages(pkg, verbose = F)
@@ -10,6 +10,7 @@ load_dependencies <- function(pkgs = list('plyr','dplyr','tidyr',
   
   lapply(pkgs, is.installed)
   pkg_string <- paste(unlist(pkgs), sep = '', collapse = ', ')
+  if(verbose){
   cat('The following packages have been loaded: ',pkg_string,'.\n',
-      sep = '')
+      sep = '')}
 }

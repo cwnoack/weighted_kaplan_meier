@@ -22,7 +22,7 @@ log_rank <- function(grouped_data, comp_group = NULL, rho = 1,
          less = {p.val <- sum(sim_G <= test_G)/boots}
          )
   
-  output <- list(G_test = test_G, boot_G = sim_G, p.val = p.val)
+  output <- list(G_test = test_G, boot_G = sim_G, p.val = p.val, rho = rho)
   
   return(output)
   

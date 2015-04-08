@@ -23,6 +23,16 @@ CvsH <- filter(R.g, Dataset != 'High')
 CvsH_test <- log_rank(CvsH, comp_group = 'Highest',
                      rho = 1, method = 'sim',
                      boots = 1000, alternative = 'greater')
-plot_wKM(group_km(grouped_data = CvsH), log_scale = T)
+grp_KM <- group_km(grouped_data = CvsH)
+
+plot_wKM(grp_KM, log_scale = T)
 
 G_rho_hist(CvsH_test)
+
+quantile_comp <- ddply(CvsH, .(Dataset),
+                       function(df) Surv_quantile(select(df, -Dataset),
+                                                  type = 'interp')
+                       ) %>%
+  spread(Dataset, Xh) %>% arrange(desc(Percentile))
+
+print(quantile_comp)

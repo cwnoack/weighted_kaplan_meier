@@ -1,4 +1,5 @@
 sim_G_rho <- function(grouped_data, rho = 1, method = 'perm'){
+  grouped_data$Dataset <- factor(grouped_data$Dataset)
   data_levels <- levels(factor(grouped_data$Dataset))
   
   p <- prop.table(table(grouped_data$Dataset))

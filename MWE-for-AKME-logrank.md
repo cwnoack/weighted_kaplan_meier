@@ -1,0 +1,59 @@
+# An example of the adjusted Kaplan-Meier estimator and the weighted log-rank test
+Clint Noack  
+April 20, 2015  
+We will use dummy data, drawn from log-normal distributions, to demonstrate the adjusted Kaplan-Meier estimator and the weighted log-rank test. This analysis requires that all relevant functions be loaded into R. This may change if the code can be successfully bundled into a package.
+
+
+```r
+library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
+library(tidyr)
+
+# Data are drawn from three separate log-normal distributions
+# Group means
+means <- c(1,1.5,2.5)
+
+# Samples in each group
+N <- 100
+
+# Generate random data
+set.seed(8675309)
+R <- data.frame(sapply(means, function(mu) rlnorm(N, mu, 1)))
+colnames(R) <- c('Control','Test.1','Test.2')
+
+# `mutate` adds censoring and site ID (sampled with uneven probability)
+R.g <- gather(R, Dataset,Concentration,Control:Test.2) %>%
+         # Assume that 60% of samples were analyzed by method with DL = 1 ppb,
+         # 40% with DL = 10 ppb
+  mutate(DL = sample(c(1, 10), size = nlevels(Dataset)*N,
+                     replace = T, prob = c(0.6,0.4)),
+         # Flag censored values and store at detection limit
+         Censored = ifelse(Concentration < DL, 1, 0),
+         Concentration = ifelse(Censored == 1, DL, Concentration),
+         # Randomly assign to sites, higher number sites have more samples
+         Site = sample(LETTERS[1:10], nlevels(Dataset)*N, replace = T,
+                       prob = 1:10/sum(1:10))) %>%
+  select(Dataset, Concentration, Censored, Site)
+```
+
+The remainder of this analysis makes use of the adjusted Kaplan-Meier estimator for observation (reported concentration) $x_i$:
+$$
+\hat{S}(x_i) = \prod_{x < x_i}\left(1 - \frac{d^w_i}{Y^w_i}\right)
+$$
+
+Where $d^w_i = \sum_{x < x_i} w_i\delta_i$, $Y^w_i = \sum_{x < x_i} w_i$, $w_{ik} = \frac{1}{n_k}$, and $\delta_i$ is a binary response for a censored value (0 for BDL measurements).

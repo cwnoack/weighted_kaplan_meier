@@ -1,15 +1,38 @@
+#' Log-rank test
+#' 
+#' Weighted or unweighted log-rank test of differences between two groups using
+#' the methodologies of Xie and Liu (2005) and Singh et al. (2014). This is a 
+#' non-parametric test that compares a true test statistics to a number of
+#' randomized statistics (randomized by simulation or one of two resampling 
+#' strategies). A P-value is calculated based on the extremity of the true statistic
+#' compared to the randomized statistics.
+#' @param grouped_data data.frame with four columns: (1) measured concentration,
+#'  (2) flag for nondetects [BDL = 1],
+#'   (3) unique site identifier,
+#'    (4) dataset identifier.
+#'    comp_group identifier of the "comparison" group for the test. Defaults to 
+#'    the second group if no value is supplied.
+#'    rho Positive, real number input. This is the exponential argument of the weighting function as in Singh et al. (2014)
+#'    method method for randomization of groupings for permutation test. Either `perm` for resampling without replacement, `boot` for resampling with replacement, or `sim` for simulation from a binomial distribution.
+#' @return observed A data.frame containing the observed concentrations, the
+#'   weighted "at-risk" and "events" at each concentration, and the survival
+#'   estimator along with some intermediate data.
 log_rank <- function(grouped_data, comp_group = NULL, rho = 1,
                      method = 'perm', boots = 1000, alternative = 'two.sided'){
   if(is.null(comp_group)){
     
     grps <- levels(factor(grouped_data$Dataset))
-    ref <- filter(grouped_data, Dataset == grps[1]) %>% select(-Dataset)
-    comp <- filter(grouped_data, Dataset == grps[2]) %>% select(-Dataset)
+    ref <- dplyr::filter(grouped_data, Dataset == grps[1]) %>% 
+      dplyr::select(-Dataset)
+    comp <- dplyr::filter(grouped_data, Dataset == grps[2]) %>% 
+      dplyr::select(-Dataset)
     
   } else {
     
-    ref <- filter(grouped_data, Dataset != comp_group) %>% select(-Dataset)
-    comp <- filter(grouped_data, Dataset == comp_group) %>% select(-Dataset)
+    ref <- dplyr::filter(grouped_data, Dataset != comp_group) %>%
+      dplyr::select(-Dataset)
+    comp <- dplyr::filter(grouped_data, Dataset == comp_group) %>%
+      dplyr::select(-Dataset)
     
   }
   

@@ -19,6 +19,6 @@ observed A data.frame containing the observed concentrations, the
 }
 \description{
 Calculates the AKME for grouped data. Requires the same input as `Surv_weighted`
-but with an additional column: "Dataset". Will return
+but with an additional column: "Dataset". Output will be same as `Surv_weighted` but for each group.
 }
 

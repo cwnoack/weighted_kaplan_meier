@@ -11,7 +11,8 @@ vignette: >
 We will use dummy data, drawn from log-normal distributions, to demonstrate the adjusted Kaplan-Meier estimator and the weighted log-rank test. This analysis requires that all relevant functions be loaded into R. This may change if the code can be successfully bundled into a package.
 
 ```{r dummy_data}
-# source('run_at_startup_to_load.R')
+# library(devtools)
+# install_github('cwnoack/weighted_kaplan_meier/AKME')
 library(AKME)
 
 # Data are drawn from three separate log-normal distributions

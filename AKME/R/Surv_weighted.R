@@ -18,22 +18,22 @@ Surv_weighted <- function(censored_data){
   
   site_weights <- calc_weights(censored_data$Site)
   
-  data_mod <- left_join(censored_data, site_weights, by = 'Site')
+  data_mod <- dplyr::left_join(censored_data, site_weights, by = 'Site')
   
-  data_mod <- arrange(data_mod, desc(Concentration)) %>%
-    mutate(Yw = sum(weight) - cumsum(weight) + weight)
+  data_mod <- dplyr::arrange(data_mod, desc(Concentration)) %>%
+    dplyr::mutate(Yw = sum(weight) - cumsum(weight) + weight)
   
-  observed <- filter(data_mod, Censored == 0) %>%
-    select(-Censored)
+  observed <- dplyr::filter(data_mod, Censored == 0) %>%
+    dplyr::select(-Censored)
   
-  obs_weight_tab <- group_by(observed, Concentration) %>%
-    summarize(dw = sum(weight))  
+  obs_weight_tab <- dplyr::group_by(observed, Concentration) %>%
+    dplyr::summarize(dw = sum(weight))  
   
-  observed <- left_join(observed, obs_weight_tab, by = "Concentration") %>%
-    mutate(P = 1 - dw/Yw) %>%
-    filter(!duplicated(Concentration)) %>%
-    mutate(S = cumprod(P),
-           S = ifelse(S<0,0,S))
+  observed <- dplyr::left_join(observed, obs_weight_tab, by = "Concentration") %>%
+    dplyr::mutate(P = 1 - dw/Yw) %>%
+    dplyr::filter(!duplicated(Concentration)) %>%
+    dplyr:: mutate(S = cumprod(P),
+                   S = ifelse(S<0,0,S))
   
   return(observed)
 }

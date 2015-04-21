@@ -4,8 +4,9 @@
 #' returns the estimator (S) along with weighted "at risk" and "event" values at
 #' each observed (uncensored) concentration. Uses methods from Xie and Liu (2005).
 #' @param censored_data data.frame with three columns: (1) measured concentration, (2) flag for nondetects [BDL = 1], (3) unique site identifier.
-#' @return
-#' @references
+#' @return observed A data.frame containing the observed concentrations, the
+#'   weighted "at-risk" and "events" at each concentration, and the survival
+#'   estimator along with some intermediate data.
 Surv_weighted <- function(censored_data){
   check_input(censored_data)
   

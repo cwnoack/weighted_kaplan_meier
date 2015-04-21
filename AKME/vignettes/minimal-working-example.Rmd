@@ -1,28 +1,18 @@
-# An example of the adjusted Kaplan-Meier estimator and the weighted log-rank test
-Clint Noack  
-April 20, 2015  
+---
+title: "AKME example with dummy data"
+author: "Clint Noack"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
 We will use dummy data, drawn from log-normal distributions, to demonstrate the adjusted Kaplan-Meier estimator and the weighted log-rank test. This analysis requires that all relevant functions be loaded into R. This may change if the code can be successfully bundled into a package.
 
-
-```r
-library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-## 
-## The following object is masked from 'package:stats':
-## 
-##     filter
-## 
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
-library(tidyr)
+```{r dummy_data}
+# source('run_at_startup_to_load.R')
+library(AKME)
 
 # Data are drawn from three separate log-normal distributions
 # Group means
@@ -49,6 +39,8 @@ R.g <- gather(R, Dataset,Concentration,Control:Test.2) %>%
          Site = sample(LETTERS[1:10], nlevels(Dataset)*N, replace = T,
                        prob = 1:10/sum(1:10))) %>%
   select(Dataset, Concentration, Censored, Site)
+
+tbl_df(R.g)
 ```
 
 The remainder of this analysis makes use of the adjusted Kaplan-Meier estimator for observation (reported concentration) $x_i$:
@@ -57,3 +49,11 @@ $$
 $$
 
 Where $d^w_i = \sum_{x < x_i} w_i\delta_i$, $Y^w_i = \sum_{x < x_i} w_i$, $w_{ik} = \frac{1}{n_k}$, and $\delta_i$ is a binary response for a censored value (0 for BDL measurements).
+
+```{r summarize_dummy_dat}
+plot_wKM(group_km(R.g), n_ticks = 4, units = 'mcg/m3')
+# grp_quantiles(R.g)
+R.g %>% ddply(.(Dataset), function(df){
+  Surv_quantile(censored_data = select(df, -Dataset), type = 'PiR')
+  }) %>% spread(Dataset, Xh) %>% arrange(desc(Percentile))
+```

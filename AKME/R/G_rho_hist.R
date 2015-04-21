@@ -1,3 +1,10 @@
+#' Plotting function for log-rank test.
+#' 
+#' Takes the output from the log-rank test (a list) and plots a histogram of
+#' the simulated/permuted/bootstrapped G* values along with the test value
+#' and associated P-value.
+#' @param log_rank_ouput output from `log_rank` function, a list
+#' 
 G_rho_hist <- function(log_rank_output){
   
   par(list(oma = c(0,0,0,0),
@@ -18,7 +25,8 @@ G_rho_hist <- function(log_rank_output){
   xlims <- get_lims()
   
   H <- hist(boot_G, breaks = 21, plot = F)
-  plot(H, main = as.expression(bquote(rho~"=" ~.(i))), xlab = expression(paste(G[rho]^"*")), xlim = xlims)
+  plot(H, main = as.expression(bquote(rho~"=" ~.(i))),
+       xlab = expression(paste(G[rho]^"*")), xlim = xlims)
   abline(v = G_test, col = 'red', lty = 2, lwd = 2)
   
   if(G_test > 0){

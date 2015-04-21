@@ -1,8 +1,9 @@
 # Function for calculating quantiles of distributions using AKME
 Surv_quantile <- function(censored_data,
                           percentiles = c(0.05,0.1,0.25,0.5,0.75,0.9,0.95),
-                          type = 'interp'){
-  cenfrac <- mean(censored_data$Censored)
+                          type = 'interp',
+                          sig.fig = 3){
+  cenfrac <- mean(as.logical(censored_data$Censored))
   
   weighted_km <- Surv_weighted(censored_data) %>% select(Concentration, S)
   
@@ -36,6 +37,7 @@ Surv_quantile <- function(censored_data,
          nearest = {perc_df <- perc_df %>%
                       mutate(Xh = weighted_km[h.low,'Concentration'])})
   
-  perc_df <- perc_df %>% arrange(desc(Percentile)) %>% select(Percentile, Xh)
+  perc_df <- perc_df %>% arrange(desc(Percentile)) %>% select(Percentile, Xh) %>%
+    mutate(Xh = signif(Xh, sig.fig))
   return(perc_df)
 }

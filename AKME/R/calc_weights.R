@@ -3,8 +3,8 @@
 #' For pooled data from many sites, or other equivalent sampling groups,
 #' calculate the weight of an individual observation from that site.
 #' @importFrom magrittr "%>%"
-#' @importFrom dplyr group_by
-#' @importFrom dplyr summarise
+#' @import plyr
+#' @import dplyr
 #' @export
 #' @param site_vector A vector of site IDs
 #' @examples

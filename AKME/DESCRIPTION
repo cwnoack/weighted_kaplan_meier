@@ -11,6 +11,7 @@ Imports:
   tidyr,
   dplyr,
   ggplot2,
-  ggthemes
+  ggthemes,
+  magrittr
 Suggests: knitr
 VignetteBuilder: knitr

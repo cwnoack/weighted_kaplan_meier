@@ -47,7 +47,7 @@ Surv_quantile <- function(censored_data,
   
   switch(type,
          interp = {perc_df <- perc_df %>%
-                     mutate(Xh = approx(x = weighted_km[c(h.low, h.high),'S'],
+                     dplyr::mutate(Xh = approx(x = weighted_km[c(h.low, h.high),'S'],
                                         y = weighted_km[c(h.low, h.high),'Concentration'],
                                         xout = Percentile)$y)},
          PiR = {perc_df <- perc_df %>%

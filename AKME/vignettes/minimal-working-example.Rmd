@@ -53,8 +53,8 @@ Where $d^w_i = \sum_{x < x_i} w_i\delta_i$, $Y^w_i = \sum_{x < x_i} w_i$, $w_{ik
 
 ```{r summarize_dummy_dat}
 plot_wKM(group_km(R.g), n_ticks = 4, units = 'mcg/m3')
-# grp_quantiles(R.g)
-R.g %>% ddply(.(Dataset), function(df){
-  Surv_quantile(censored_data = select(df, -Dataset), type = 'PiR')
-  }) %>% spread(Dataset, Xh) %>% arrange(desc(Percentile))
+grp_quantiles(R.g)
+# R.g %>% ddply(.(Dataset), function(df){
+#   Surv_quantile(censored_data = select(df, -Dataset), type = 'PiR')
+#   }) %>% spread(Dataset, Xh) %>% arrange(desc(Percentile))
 ```

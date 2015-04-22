@@ -5,6 +5,9 @@
 #' the value of rho to be used. A value of 1 returns a statistic weighted
 #' towards the largest observations (concentrations) by multiplying by a function
 #' of the pooled survival estimator, while a value of 0 returns an unweighted statistic.
+#' @importFrom magrittr "%>%"
+#' @export
+#' @import dplyr
 #' @param ref_data data.frame with three columns: (1) measured concentration, (2) flag for nondetects [BDL = 1], (3) unique site identifier.
 #'        comp_data data.frame with three columns: (1) measured concentration, (2) flag for nondetects [BDL = 1], (3) unique site identifier.
 #'        rho Positive, real number input. This is the exponential argument of the weighting function as in Singh et al. (2014)
@@ -15,7 +18,7 @@ G_rho <- function(ref_data, comp_data, rho = 1){
   comp_KM <- Surv_weighted(comp_data) %>% dplyr::select(Concentration, Yw, dw)
   
   comb_KM <- merge(ref_KM, comp_KM, by = 'Concentration', all = T) %>%
-    dplyr::arrange(desc(Concentration))
+    dplyr::arrange(dplyr::desc(Concentration))
   colnames(comb_KM) <- c('Concentration', 'Yw_ref', 'dw_ref', 'Yw_comp', 'dw_comp')
   
   comb_KM <- comb_KM %>%

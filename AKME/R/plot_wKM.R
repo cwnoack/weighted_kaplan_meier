@@ -1,3 +1,8 @@
+#' @importFrom ggthemes gdocs_pal
+#' @import plyr
+#' @import dplyr
+#' @export
+
 plot_wKM <- function(grouped_km, log_scale = T, n_ticks = 5,
                      tick_step = 1, units = 'ppb'){
   par(list(oma = c(0,0,0,0),
@@ -32,9 +37,9 @@ plot_wKM <- function(grouped_km, log_scale = T, n_ticks = 5,
   
   n_colors <- length(unique(grouped_km$Dataset))
   color_df <- data.frame(Dataset = unique(grouped_km$Dataset),
-                         line_color = gdocs_pal()(n_colors))
-  grouped_plot_data <- left_join(grouped_km, color_df, by = "Dataset")
-  d_ply(grouped_plot_data, .(Dataset),
+                         line_color = ggthemes::gdocs_pal()(n_colors))
+  grouped_plot_data <- dplyr::left_join(grouped_km, color_df, by = "Dataset")
+  plyr::d_ply(grouped_plot_data, .(Dataset),
         function(df) {lines(df$Concentration, df$S, lwd = 1.5,
                             type = 's', col = unique(df$line_color))})
   

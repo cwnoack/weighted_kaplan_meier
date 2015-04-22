@@ -3,6 +3,8 @@
 #' Takes the output from the log-rank test (a list) and plots a histogram of
 #' the simulated/permuted/bootstrapped G* values along with the test value
 #' and associated P-value.
+#' @importFrom magrittr "%>%"
+#' @export
 #' @param log_rank_ouput output from `log_rank` function, a list
 #' 
 G_rho_hist <- function(log_rank_output){

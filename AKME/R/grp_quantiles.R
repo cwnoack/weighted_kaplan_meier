@@ -3,6 +3,10 @@
 #' Calculates the AKME for grouped data and returns a table of desired quantiles.
 #'  Requires the same input as `Surv_quanitle` but with an additional column:
 #'   "Dataset". Output will be same as `Surv_quantile` but for each group.
+#' @importFrom magrittr "%>%"
+#' @import plyr
+#' @import dplyr
+#' @export
 #' @param grouped_data data.frame with four columns: (1) measured concentration,
 #'  (2) flag for nondetects [BDL = 1],
 #'   (3) unique site identifier,

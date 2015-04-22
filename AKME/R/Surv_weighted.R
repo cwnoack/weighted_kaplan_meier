@@ -3,6 +3,9 @@
 #' Calculates the AKME of the survival function for right censored data and
 #' returns the estimator (S) along with weighted "at risk" and "event" values at
 #' each observed (uncensored) concentration. Uses methods from Xie and Liu (2005).
+#' @export
+#' @import plyr
+#' @import dplyr
 #' @param censored_data data.frame with three columns: (1) measured concentration, (2) flag for nondetects [BDL = 1], (3) unique site identifier.
 #' @return observed A data.frame containing the observed concentrations, the
 #'   weighted "at-risk" and "events" at each concentration, and the survival

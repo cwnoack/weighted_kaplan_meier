@@ -6,6 +6,9 @@
 #'  the fraction of censored data and may produce NA values for order statistics at 
 #'  those percentiles depending on the `type` argument to the function 
 #'  (i.e. `nearest` will not return NA but may return repeated values).
+#' @export
+#' @import plyr
+#' @import dplyr
 #' @param censored_data data.frame with three columns: (1) measured concentration,
 #'  (2) flag for nondetects [BDL = 1], and
 #'   (3) unique site identifier

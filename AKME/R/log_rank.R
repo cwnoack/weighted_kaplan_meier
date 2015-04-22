@@ -6,6 +6,10 @@
 #' randomized statistics (randomized by simulation or one of two resampling 
 #' strategies). A P-value is calculated based on the extremity of the true statistic
 #' compared to the randomized statistics.
+#' @export
+#' @importFrom magrittr "%>%"
+#' @import plyr
+#' @import dplyr
 #' @param grouped_data data.frame with four columns: (1) measured concentration,
 #'  (2) flag for nondetects [BDL = 1],
 #'   (3) unique site identifier,

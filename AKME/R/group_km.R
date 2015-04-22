@@ -2,6 +2,9 @@
 #' 
 #' Calculates the AKME for grouped data. Requires the same input as `Surv_weighted`
 #' but with an additional column: "Dataset". Output will be same as `Surv_weighted` but for each group.
+#' @importFrom magrittr "%>%"
+#' @import dplyr
+#' @export
 #' @param grouped_data data.frame with four columns: (1) measured concentration,
 #'  (2) flag for nondetects [BDL = 1],
 #'   (3) unique site identifier,

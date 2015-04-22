@@ -5,6 +5,7 @@
 #' flag [numeric/factor/logical/integer], and (3) a site identifier
 #' [factor/character/integer/numeric].
 #' @param censored_data a data.frame of three columns.
+#' @export
 #' @examples
 #' data_good <- data.frame(Concentration = rlnorm(100,1,2),
 #'  Censored = rbinom(100,1,0.2),

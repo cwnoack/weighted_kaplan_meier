@@ -1,4 +1,7 @@
-# Apply Greenwood's formula for S.E. estimation of survival function
+#' Apply Greenwood's formula for S.E. estimation of survival function
+#' @export
+#' @import plyr
+#' @import dplyr
 Surv_wconf <- function(wKM_object, alpha = 0.05){
   pm <- qnorm(1-alpha/2)
   wKM_object_alt <- wKM_object %>%

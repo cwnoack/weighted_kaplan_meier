@@ -1,52 +1,36 @@
-#' Log-rank test statistic G_rho
-#' 
-#' Calculates the test statistic G_rho for comparison of two data.frames: one with
-#' the "reference" data and one with the "comparison" data. Additional input is
-#' the value of rho to be used. A value of 1 returns a statistic weighted
-#' towards the largest observations (concentrations) by multiplying by a function
-#' of the pooled survival estimator, while a value of 0 returns an unweighted statistic.
-#' @importFrom magrittr "%>%"
+#' Weighted log-rank test statistic G_rho
+#'
+#' Calculates the test statistic `G_rho` for a comparison of two data
+#' frames: a *reference* group and a *comparison* group. `rho` is the
+#' exponent of the pooled survival weight in the integrand: `rho = 0`
+#' gives an unweighted log-rank statistic; `rho = 1` weights toward the
+#' largest observations (Singh et al., 2014).
+#'
+#' @param ref_data Reference-group data: a data frame whose first three
+#'   columns are concentration, censoring flag, and site identifier.
+#' @param comp_data Comparison-group data, same structure as `ref_data`.
+#' @param rho Non-negative real number. Exponent of the pooled survival
+#'   weight; `0` yields an unweighted statistic.
+#' @return The numeric value of the test statistic `G`.
 #' @export
-#' @import dplyr
-#' @param ref_data data.frame with three columns: (1) measured concentration, (2) flag for nondetects [BDL = 1], (3) unique site identifier.
-#'        comp_data data.frame with three columns: (1) measured concentration, (2) flag for nondetects [BDL = 1], (3) unique site identifier.
-#'        rho Positive, real number input. This is the exponential argument of the weighting function as in Singh et al. (2014)
-#' @return G real number value of test statistic
-#' 
-G_rho <- function(ref_data, comp_data, rho = 1){
-  ref_KM <- Surv_weighted(ref_data) %>% dplyr::select(Concentration, Yw, dw)
-  comp_KM <- Surv_weighted(comp_data) %>% dplyr::select(Concentration, Yw, dw)
-  
-  comb_KM <- merge(ref_KM, comp_KM, by = 'Concentration', all = T) %>%
-    dplyr::arrange(dplyr::desc(Concentration))
-  colnames(comb_KM) <- c('Concentration', 'Yw_ref', 'dw_ref', 'Yw_comp', 'dw_comp')
-  
-  comb_KM <- comb_KM %>%
-    dplyr::mutate(dw_ref = ifelse(is.na(dw_ref),0, dw_ref),
-           dw_comp = ifelse(is.na(dw_comp),0, dw_comp),
-           Yw_ref = max(Yw_ref, na.rm = T) - cumsum(dw_ref) + dw_ref,
-           Yw_comp = max(Yw_comp, na.rm = T) - cumsum(dw_comp) + dw_comp,
-           dw_pool = dw_ref + dw_comp,
-           Yw_pool = Yw_ref + Yw_comp,
-           S_pool = cumprod(1 - dw_pool/Yw_pool),
-           S_pool = ifelse(S_pool<0, 0, S_pool),
-           sum_arg = S_pool^rho *(dw_comp - Yw_comp*(dw_pool/Yw_pool))
-           )
-  G <- with(comb_KM, sum(sum_arg))
-  return(G)
-  
+G_rho <- function(ref_data, comp_data, rho = 1) {
+  ref_KM  <- Surv_weighted(ref_data)  |> dplyr::select("Concentration", "Yw", "dw")
+  comp_KM <- Surv_weighted(comp_data) |> dplyr::select("Concentration", "Yw", "dw")
+
+  comb_KM <- ref_KM |>
+    dplyr::full_join(comp_KM, by = "Concentration", suffix = c("_ref", "_comp")) |>
+    dplyr::arrange(dplyr::desc(.data$Concentration)) |>
+    tidyr::replace_na(list(dw_ref = 0, dw_comp = 0)) |>
+    dplyr::mutate(
+      Yw_ref  = max(.data$Yw_ref,  na.rm = TRUE) - cumsum(.data$dw_ref)  + .data$dw_ref,
+      Yw_comp = max(.data$Yw_comp, na.rm = TRUE) - cumsum(.data$dw_comp) + .data$dw_comp,
+      dw_pool = .data$dw_ref + .data$dw_comp,
+      Yw_pool = .data$Yw_ref + .data$Yw_comp,
+      S_pool  = cumprod(1 - .data$dw_pool / .data$Yw_pool),
+      S_pool  = pmax(.data$S_pool, 0),
+      sum_arg = .data$S_pool^rho *
+        (.data$dw_comp - .data$Yw_comp * (.data$dw_pool / .data$Yw_pool))
+    )
+
+  sum(comb_KM$sum_arg)
 }
-
-## MWE for testing
-# N <- 1000
-# dummy_dat <- data.frame(Concentration = rlnorm(N, 1, 3),
-#                         Censored = rbinom(N, 1, 0.3),
-#                         Site = sample(LETTERS[1:6], N, T, 1:6/sum(1:6)),
-#                         Dataset = rep(1:2, each = N/2))
-# 
-# KM1 <- filter(dummy_dat, Dataset == 1)
-# KM2 <- filter(dummy_dat, Dataset == 2)
-# 
-# G_test <- G_rho(KM1, KM2, rho = 0)
-# print(G_test)
-

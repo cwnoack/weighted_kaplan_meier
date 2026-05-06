@@ -1,4 +1,11 @@
 .Rproj.user
 .Rhistory
 .RData
-MWE_for_logrank.R
+.Ruserdata
+
+# pkgdown site
+docs/
+
+# Build artifacts
+*.tar.gz
+inst/doc/

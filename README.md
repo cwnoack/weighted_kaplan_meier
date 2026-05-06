@@ -1,3 +1,34 @@
-# Weighted Kaplan-Meier estimator of the survival function and related functions
+# weighted_kaplan_meier
 
-Starting to put together some code that uses weighting methods to adjust survival analyses for unevenly sampled sites (i.e. to avoid biasing towards site with most samples). Functions include the survival estimator, quantile estimation, plotting functions, and a permutation/simulation based Log-Rank test for comparing two groups. FYI, things are poorly annotated right now as I work on documentation.
+This repository contains the **AKME** R package: an Adjusted (weighted)
+Kaplan-Meier estimator of the survival function for right-censored
+concentration data, plus a weighted log-rank test for comparing two groups.
+The methods follow Xie & Liu (2005) and Singh et al. (2014).
+
+The package is in [`AKME/`](AKME/).
+
+## Installation
+
+From a local clone:
+
+```r
+# install.packages("pak")
+pak::pkg_install("local::./AKME")
+```
+
+Or directly from GitHub:
+
+```r
+pak::pkg_install("cwnoack/weighted_kaplan_meier/AKME")
+```
+
+## Getting started
+
+```r
+library(AKME)
+vignette("akme", package = "AKME")
+```
+
+The vignette walks through the full workflow: generating censored,
+multi-site data, running `Surv_weighted()`, comparing groups with
+`log_rank()`, and plotting with `plot_wKM()` and `G_rho_hist()`.

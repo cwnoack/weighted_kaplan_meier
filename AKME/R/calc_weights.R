@@ -1,18 +1,17 @@
-#' Calculate the site-specific observational weights as 1/n
-#' 
-#' For pooled data from many sites, or other equivalent sampling groups,
-#' calculate the weight of an individual observation from that site.
-#' @importFrom magrittr "%>%"
-#' @import plyr
-#' @import dplyr
+#' Calculate site-specific observational weights as 1/n
+#'
+#' For pooled data from many sites (or any equivalent sampling group),
+#' calculate the weight `1 / n_k` of an individual observation from site `k`.
+#'
+#' @param site_vector A vector of site identifiers.
+#' @return A tibble with columns `Site` and `weight`.
 #' @export
-#' @param site_vector A vector of site IDs
 #' @examples
-#' sites <- sample(letters[1:10],100,replace = T, prob = 1:10/sum(1:10))
-#' weights <- calc_weights(sites)
-
-calc_weights <- function(site_vector){
-  counts <- data.frame(Site = site_vector) %>%
-    dplyr::group_by(Site) %>% dplyr::summarise(weight = 1/n())
-  return(counts)
+#' sites <- sample(letters[1:10], 100, replace = TRUE,
+#'                 prob = 1:10 / sum(1:10))
+#' calc_weights(sites)
+calc_weights <- function(site_vector) {
+  tibble::tibble(Site = site_vector) |>
+    dplyr::group_by(.data$Site) |>
+    dplyr::summarise(weight = 1 / dplyr::n(), .groups = "drop")
 }

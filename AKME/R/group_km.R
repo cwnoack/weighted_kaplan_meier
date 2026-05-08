@@ -1,20 +1,19 @@
 #' AKME for grouped data
-#' 
-#' Calculates the AKME for grouped data. Requires the same input as `Surv_weighted`
-#' but with an additional column: "Dataset". Output will be same as `Surv_weighted` but for each group.
-#' @importFrom magrittr "%>%"
-#' @import dplyr
+#'
+#' Calculates the adjusted Kaplan-Meier estimator separately within each
+#' level of `Dataset`. Inputs are the same as [Surv_weighted()] plus an
+#' additional `Dataset` column.
+#'
+#' @param grouped_data A data frame with columns
+#'   (1) measured concentration, (2) censoring flag, (3) site identifier,
+#'   and (4) `Dataset`.
+#' @return A tibble with one row per (Dataset, observed concentration)
+#'   combination and the AKME columns from [Surv_weighted()].
+#' @seealso [Surv_weighted()], [grp_quantiles()].
 #' @export
-#' @param grouped_data data.frame with four columns: (1) measured concentration,
-#'  (2) flag for nondetects [BDL = 1],
-#'   (3) unique site identifier,
-#'    (4) dataset identifier.
-#' @return observed A data.frame containing the observed concentrations, the
-#'   weighted "at-risk" and "events" at each concentration, and the survival
-#'   estimator along with some intermediate data.
-group_km <- function(grouped_data){
-  separate_KM <- plyr::ddply(grouped_data, .(Dataset),
-                       function(df){Surv_weighted(select(df, -Dataset))}) %>%
-    dplyr::tbl_df()
-  return(separate_KM)
+group_km <- function(grouped_data) {
+  grouped_data |>
+    dplyr::group_by(.data$Dataset) |>
+    dplyr::group_modify(\(.x, .y) Surv_weighted(.x)) |>
+    dplyr::ungroup()
 }

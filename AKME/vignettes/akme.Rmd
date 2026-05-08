@@ -1,0 +1,118 @@
+---
+title: "Getting started with AKME"
+author: "Clint Noack"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with AKME}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
+)
+```
+
+This vignette walks through the AKME workflow end-to-end on synthetic
+data: an adjusted Kaplan–Meier estimator of the survival function for
+right-censored concentration data, plus the weighted log-rank test of
+Singh et al. (2014).
+
+## The estimator
+
+For an observation (reported concentration) $x_i$ the adjusted
+Kaplan–Meier estimator is
+
+$$
+\widehat{S}(x_i) \;=\; \prod_{x < x_i}\!\left(1 - \frac{d^w_i}{Y^w_i}\right),
+$$
+
+where
+$d^w_i = \sum_{x < x_i} w_i \delta_i$,
+$Y^w_i = \sum_{x < x_i} w_i$,
+$w_{ik} = 1 / n_k$ is the per-observation weight at site $k$
+(with $n_k$ samples at that site), and $\delta_i$ is a binary
+detection indicator (0 for below-detection-limit measurements).
+
+## Generate synthetic data
+
+We draw three independent log-normal datasets with different means,
+randomly assign each measurement to one of ten sites with uneven
+probability, and simulate a mixed-detection-limit assay that produces
+right-censored values.
+
+```{r data}
+library(AKME)
+library(dplyr)
+library(tidyr)
+
+means <- c(1, 1.5, 2.5)
+N <- 100
+
+set.seed(8675309)
+R <- data.frame(vapply(means, function(mu) rlnorm(N, mu, 1), numeric(N)))
+colnames(R) <- c("Control", "High", "Highest")
+
+R.g <- R |>
+  as_tibble() |>
+  pivot_longer(everything(), names_to = "Dataset", values_to = "Concentration") |>
+  mutate(
+    DL = sample(c(1, 10), size = n(), replace = TRUE, prob = c(0.6, 0.4)),
+    Censored = as.integer(Concentration < DL),
+    Concentration = if_else(Censored == 1L, DL, Concentration),
+    Site = sample(LETTERS[1:10], size = n(), replace = TRUE,
+                  prob = 1:10 / sum(1:10))
+  ) |>
+  select(Dataset, Concentration, Censored, Site)
+
+R.g
+```
+
+## Compare two groups with a weighted log-rank test
+
+```{r logrank}
+CvsH <- filter(R.g, Dataset != "High")
+
+CvsH_test <- log_rank(
+  CvsH,
+  comp_group  = "Highest",
+  rho         = 1,
+  method      = "sim",
+  boots       = 500,
+  alternative = "greater"
+)
+
+CvsH_test$G_test
+CvsH_test$p.val
+```
+
+## Plot survival curves and the null distribution
+
+`plot_wKM()` and `G_rho_hist()` return ggplot objects; in a vignette
+or REPL they auto-print.
+
+```{r plots}
+grp_KM <- group_km(CvsH)
+plot_wKM(grp_KM, log_scale = TRUE)
+
+G_rho_hist(CvsH_test)
+```
+
+## Quantile estimates per group
+
+```{r quantiles}
+grp_quantiles(R.g)
+```
+
+## References
+
+- Xie, J., & Liu, C. (2005). Adjusted Kaplan-Meier estimator and
+  log-rank test with inverse probability of treatment weighting for
+  survival data. *Statistics in Medicine*, 24(20), 3089–3110.
+- Singh, R., Mukhopadhyay, K., & Mantel, N. (2014). Weighted log-rank
+  tests with applications to censored data.

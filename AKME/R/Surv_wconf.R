@@ -1,36 +1,31 @@
-#' Apply Greenwood's formula for S.E. estimation of survival function
+#' Greenwood-style confidence band for the weighted Kaplan-Meier estimator
+#'
+#' Adds Greenwood standard errors and approximate `(1 - alpha)` confidence
+#' bands to the output of [Surv_weighted()].
+#'
+#' @param wKM_object Output of [Surv_weighted()].
+#' @param alpha Type-I error rate. Default `0.05` for a 95% interval.
+#' @return A tibble with the columns of `wKM_object` plus `std_err`, `UCI`,
+#'   and `LCI`.
 #' @export
-#' @import plyr
-#' @import dplyr
-Surv_wconf <- function(wKM_object, alpha = 0.05){
-  pm <- qnorm(1-alpha/2)
-  wKM_object_alt <- wKM_object %>%
-    mutate(ratio_term = dw/Yw/(Yw - dw),
-           ratio_term = ifelse(ratio_term == Inf, 0, ratio_term),
-           sqrt_term = sqrt( ratio_term ),
-           std_err = S * sqrt_term, std_err = ifelse(is.na(std_err),0, std_err),
-           UCI = S + pm*std_err, UCI = ifelse(UCI > 1, 1, UCI),
-           LCI = S - pm*std_err, LCI = ifelse(LCI <= 0, 0, LCI)) %>%
-    select(-sqrt_term, -ratio_term)
-  return(wKM_object_alt)
+#' @examples
+#' set.seed(1)
+#' dat <- data.frame(
+#'   Concentration = rlnorm(50, 1, 1),
+#'   Censored = rbinom(50, 1, 0.2),
+#'   Site = sample(letters[1:3], 50, replace = TRUE)
+#' )
+#' Surv_wconf(Surv_weighted(dat))
+Surv_wconf <- function(wKM_object, alpha = 0.05) {
+  pm <- stats::qnorm(1 - alpha / 2)
+  wKM_object |>
+    dplyr::mutate(
+      ratio_term = .data$dw / .data$Yw / (.data$Yw - .data$dw),
+      ratio_term = dplyr::if_else(is.finite(.data$ratio_term), .data$ratio_term, 0),
+      std_err = .data$S * sqrt(.data$ratio_term),
+      std_err = tidyr::replace_na(.data$std_err, 0),
+      UCI = pmin(.data$S + pm * .data$std_err, 1),
+      LCI = pmax(.data$S - pm * .data$std_err, 0)
+    ) |>
+    dplyr::select(-"ratio_term")
 }
-
-# # MWE for replication
-# 
-# N <- 1000
-# dummy_dat <- data.frame(Concentration = rlnorm(N, 1, 3),
-#                           Censored = rbinom(N, 1, 0.3),
-#                           Site = sample(LETTERS[1:4], N, T))
-# 
-# KM <- Surv_weighted(dummy_dat)
-# 
-# KM_wconf <- KM %>% Surv_wconf() %>% tbl_df()
-# 
-# print(KM_wconf)
-# 
-# plt <- ggplot(KM_wconf, aes(x = Concentration, y = S)) +
-#   geom_step(aes(y = UCI), color = 'red', linetype = 1) +
-#   geom_step(aes(y = LCI), color = 'red', linetype = 1) +
-#   geom_step() + scale_x_log10() +theme_classic()
-# 
-# print(plt)

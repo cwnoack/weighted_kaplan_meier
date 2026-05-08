@@ -1,0 +1,26 @@
+url: https://cwnoack.github.io/weighted_kaplan_meier/
+
+template:
+  bootstrap: 5
+
+reference:
+  - title: Survival estimator
+    desc: Weighted Kaplan-Meier estimator and confidence bands.
+    contents:
+      - Surv_weighted
+      - Surv_wconf
+      - Surv_quantile
+      - calc_weights
+      - check_input
+  - title: Group comparison
+    desc: Per-group AKME, weighted log-rank test, and per-group quantiles.
+    contents:
+      - group_km
+      - grp_quantiles
+      - log_rank
+      - G_rho
+      - sim_G_rho
+  - title: Plotting
+    contents:
+      - plot_wKM
+      - G_rho_hist
